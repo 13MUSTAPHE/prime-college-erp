@@ -36,24 +36,7 @@ import {
 // FIREBASE CONFIGURATION
 // ========================================
 // ⚠️ IMPORTANT: Replace with YOUR Firebase config from console.firebase.google.com
-const firebaseConfig = {
-  apiKey: "AIzaSyBnTo1EjpFq8qsAHd2QWGgjzE3ddE5KtQI",
-  authDomain: "prime-collge-epr.firebaseapp.com",
-  projectId: "prime-collge-epr",
-  storageBucket: "prime-collge-epr.firebasestorage.app",
-  messagingSenderId: "608090500576",
-  appId: "1:608090500576:web:536c03a82161ab480ecf85",
-  measurementId: "G-R63HJ0TFNY"
-};
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
 
-// Enable persistence (offline support)
-setPersistence(auth, browserLocalPersistence).catch((error) => {
-  console.error("Persistence error:", error);
-});
 
 // ========================================
 // GLOBAL VARIABLES
