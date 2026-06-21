@@ -9,25 +9,27 @@
 
 <!-- Firebase SDK -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-  import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
-  
-  // FIREBASE CONFIG - Replace with your actual config
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY_HERE",
-    authDomain: "prime-college-erp.firebaseapp.com",
-    projectId: "prime-college-erp",
-    storageBucket: "prime-college-erp.appspot.com",
-    messagingSenderId: "123456789",
-    appId: "1:123456789:web:abc123def456"
-  };
-  
-  // Initialize Firebase
-  window.firebaseApp = initializeApp(firebaseConfig);
-  window.firebaseAuth = getAuth(window.firebaseApp);
-  window.firebaseDb = getFirestore(window.firebaseApp);
-  
+ // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyBnTo1EjpFq8qsAHd2QWGgjzE3ddE5KtQI",
+  authDomain: "prime-collge-epr.firebaseapp.com",
+  projectId: "prime-collge-epr",
+  storageBucket: "prime-collge-epr.firebasestorage.app",
+  messagingSenderId: "608090500576",
+  appId: "1:608090500576:web:536c03a82161ab480ecf85",
+  measurementId: "G-R63HJ0TFNY"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);  
   console.log("✅ Firebase initialized successfully!");
 </script>
 </head>
