@@ -1,4 +1,15 @@
 /* ========================================
+PRIME COLLEGE ERP - COMPLETE SYSTEM
+======================================== */
+
+// ✅ KU DAR TAN BILOWGA:
+const auth = window.firebaseAuth;
+const db = window.firebaseDb;
+
+// Hadda variables-kii hore
+let students = JSON.parse(localStorage.getItem("students")) || [];
+let payments = JSON.parse(localStorage.getItem("payments")) || [];
+// ... dhammaan code-kii hore/* ========================================
 PRIME COLLEGE ERP v6.0 - ONLINE SYSTEM (FIREBASE)
 ======================================== */
 
