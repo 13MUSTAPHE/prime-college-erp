@@ -28,8 +28,11 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);  
+ // ✅ MUHIIM: Ku dar window
+  window.firebaseApp = initializeApp(firebaseConfig);
+  window.firebaseAuth = getAuth(window.firebaseApp);
+  window.firebaseDb = getFirestore(window.firebaseApp);
+  
   console.log("✅ Firebase initialized successfully!");
 </script>
 </head>
