@@ -1,4 +1,4 @@
-const auth = window.firebaseAuth || null;
+
 const db = window.firebaseDb || null;
 
 // Kadibna code-kii hore...
