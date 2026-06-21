@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prime College ERP System - Online</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+  import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+  
+  // FIREBASE CONFIG - Replace with your actual config
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY_HERE",
+    authDomain: "prime-college-erp.firebaseapp.com",
+    projectId: "prime-college-erp",
+    storageBucket: "prime-college-erp.appspot.com",
+    messagingSenderId: "123456789",
+    appId: "1:123456789:web:abc123def456"
+  };
+  
+  // Initialize Firebase
+  window.firebaseApp = initializeApp(firebaseConfig);
+  window.firebaseAuth = getAuth(window.firebaseApp);
+  window.firebaseDb = getFirestore(window.firebaseApp);
+  
+  console.log("✅ Firebase initialized successfully!");
+</script>
+</head>
+<body>
+
+<!-- TOAST NOTIFICATION CONTAINER -->
+<div id="toastContainer" class="toast-container"></div>
+
+<!-- LOADING SCREEN -->
+<div id="loadingScreen" class="loading-screen">
+  <div class="loading-content">
+    <i class="fas fa-spinner fa-spin"></i>
+    <h2>Loading Prime College ERP...</h2>
+    <p>Connecting to cloud database...</p>
+  </div>
+</div>
+
+<!-- LOGIN PAGE -->
+<div class="login-page" id="loginPage" style="display:none;">
+  <div class="login-container">
+    <div class="login-left">
+      <div class="brand-logo">
+        <i class="fas fa-graduation-cap"></i>
+        <h1>Prime College</h1>
+        <p>Online Education Management System</p>
+      </div>
+      <div class="features-list">
+        <div class="feature-item"><i class="fas fa-cloud"></i><span>Cloud-Based System</span></div>
+        <div class="feature-item"><i class="fas fa-users"></i><span>Multi-User Access</span></div>
+        <div class="feature-item"><i class="fas fa-sync"></i><span>Real-Time Sync</span></div>
+        <div class="feature-item"><i class="fas fa-shield-alt"></i><span>Secure Authentication</span></div>
+      </div>
+    </div>
+    <div class="login-right">
+      <div class="login-header">
+        <h2>Welcome Back</h2>
+        <p>Sign in to access your dashboard</p>
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-envelope"></i> Email</label>
+        <input type="email" id="loginEmail" placeholder="admin@primecollege.so">
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-lock"></i> Password</label>
+        <input type="password" id="loginPassword" placeholder="Enter password">
+      </div>
+      <button class="btn-primary" id="loginBtn">
+        <i class="fas fa-sign-in-alt"></i> Login to System
+      </button>
+      <div class="login-footer">
+        <p><strong>Demo:</strong> admin@primecollege.so / admin123</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN SYSTEM -->
+<div class="system" id="systemPage" style="display:none;">
+  
+  <!-- TOP HEADER MENU -->
+  <header class="top-menu-header">
+    <div class="top-menu-brand">
+      <i class="fas fa-graduation-cap"></i>
+      <span>Prime College ERP</span>
+    </div>
+    <div class="top-menu-actions">
+      <button class="top-menu-btn" title="Global Search" onclick="openSearchModal()">
+        <i class="fas fa-search"></i>
+      </button>
+      <button class="top-menu-btn" title="Notifications">
+        <i class="fas fa-bell"></i>
+        <span class="notif-badge" id="notifBadge">0</span>
+      </button>
+      <button class="top-menu-btn" title="Toggle Theme" onclick="toggleTheme()">
+        <i class="fas fa-moon" id="themeIcon"></i>
+      </button>
+      <div class="user-dropdown">
+        <button class="top-menu-btn user-menu-btn" onclick="toggleUserDropdown()">
+          <i class="fas fa-user-circle"></i>
+          <span id="currentUserDisplay">User</span>
+          <i class="fas fa-chevron-down" style="font-size:12px;"></i>
+        </button>
+        <div class="user-dropdown-menu" id="userDropdown">
+          <div class="user-dropdown-header">
+            <i class="fas fa-user-circle"></i>
+            <div>
+              <strong id="dropdownUsername">User</strong>
+              <small id="currentRoleDisplay">Role</small>
+            </div>
+          </div>
+          <div class="user-dropdown-divider"></div>
+          <button onclick="showSection('settings')"><i class="fas fa-cog"></i> Settings</button>
+          <button onclick="showSection('about')"><i class="fas fa-info-circle"></i> About</button>
+          <div class="user-dropdown-divider"></div>
+          <button onclick="logout()" class="logout-menu-item"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <i class="fas fa-university"></i>
+      <h2>Prime College</h2>
+    </div>
+    <div class="menu-category">Main Menu</div>
+    <nav class="sidebar-menu">
+      <button id="nav-dashboard" class="active" onclick="showSection('dashboard')"><i class="fas fa-tachometer-alt"></i><span>Dashboard</span></button>
+      <button id="nav-registration" onclick="showSection('registration')"><i class="fas fa-user-plus"></i><span>Registration</span></button>
+      <button id="nav-finance" onclick="showSection('finance')"><i class="fas fa-money-bill-wave"></i><span>Finance</span></button>
+      <button id="nav-examination" onclick="showSection('examination')"><i class="fas fa-clipboard-list"></i><span>Examination</span></button>
+      <button id="nav-published" onclick="showSection('published')"><i class="fas fa-check-circle"></i><span>Published Results</span></button>
+      <button id="nav-portal" onclick="showSection('portal')"><i class="fas fa-door-open"></i><span>Student Portal</span></button>
+      <button id="nav-reports" onclick="showSection('reports')"><i class="fas fa-chart-bar"></i><span>Reports</span></button>
+      <button id="nav-archive" onclick="showSection('archive')"><i class="fas fa-archive"></i><span>Archive</span></button>
+      <button id="nav-users" onclick="showSection('users')"><i class="fas fa-users-cog"></i><span>Users</span></button>
+      <button id="nav-settings" onclick="showSection('settings')"><i class="fas fa-cog"></i><span>Settings</span></button>
+      <button id="nav-about" onclick="showSection('about')"><i class="fas fa-info-circle"></i><span>About</span></button>
+    </nav>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1 id="pageTitle">Dashboard</h1>
+        <p id="pageSubtitle">Overview of college activities</p>
+      </div>
+      <div class="topbar-right">
+        <div class="date-display">
+          <i class="fas fa-calendar-alt"></i>
+          <span id="currentDate"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <section class="page-section" id="dashboard" style="display:block;">
+      <div class="dashboard-cards">
+        <div class="card card-students">
+          <div class="card-icon"><i class="fas fa-user-graduate"></i></div>
+          <div class="card-content">
+            <h3>Total Students</h3>
+            <h1 id="dashTotalStudents">0</h1>
+          </div>
+        </div>
+        <div class="card card-revenue">
+          <div class="card-icon"><i class="fas fa-dollar-sign"></i></div>
+          <div class="card-content">
+            <h3>Total Revenue</h3>
+            <h1 id="dashTotalPaid">$0</h1>
+          </div>
+        </div>
+        <div class="card card-results">
+          <div class="card-icon"><i class="fas fa-clipboard-check"></i></div>
+          <div class="card-content">
+            <h3>Published Results</h3>
+            <h1 id="dashPublishedResults">0</h1>
+          </div>
+        </div>
+        <div class="card card-balance">
+          <div class="card-icon"><i class="fas fa-exclamation-triangle"></i></div>
+          <div class="card-content">
+            <h3>Pending Balance</h3>
+            <h1 id="dashTotalBalance">$0</h1>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-box">
+        <h2><i class="fas fa-chart-pie"></i> Faculty Distribution</h2>
+        <div id="facultyDistribution"></div>
+      </div>
+    </section>
+
+    <!-- REGISTRATION (COMPACT FORM) -->
+    <section class="page-section" id="registration" style="display:none;">
+      <div class="section-box">
+        <h2><i class="fas fa-user-plus"></i> Register New Student</h2>
+        <div class="compact-form">
+          <div class="compact-form-grid">
+            <div class="compact-input-group">
+              <label><i class="fas fa-id-card"></i> Student ID *</label>
+              <input type="text" id="regId" placeholder="e.g. PC001" maxlength="20">
+            </div>
+            <div class="compact-input-group">
+              <label><i class="fas fa-user"></i> Full Name *</label>
+              <input type="text" id="regName" placeholder="Full name" maxlength="50">
+            </div>
+            <div class="compact-input-group">
+              <label><i class="fas fa-university"></i> Faculty *</label>
+              <select id="regFaculty">
+                <option value="">Select Faculty</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Health Science">Health Science</option>
+                <option value="Business">Business</option>
+                <option value="Social Science">Social Science</option>
+              </select>
+            </div>
+            <div class="compact-input-group">
+              <label><i class="fas fa-clock"></i> Shift</label>
+              <select id="regShift">
+                <option value="">Select Shift</option>
+                <option>Morning</option>
+                <option>Afternoon</option>
+                <option>Evening</option>
+              </select>
+            </div>
+            <div class="compact-input-group">
+              <label><i class="fas fa-phone"></i> Phone</label>
+              <input type="tel" id="regPhone" placeholder="+252..." maxlength="15">
+            </div>
+            <div class="compact-input-group">
+              <label><i class="fas fa-lock"></i> Portal Password *</label>
+              <input type="password" id="regPassword" placeholder="Password" maxlength="20">
+            </div>
+            <div class="compact-input-group">
+              <label><i class="fas fa-tag"></i> Status</label>
+              <select id="regStatus">
+                <option>Regular</option>
+                <option>Scholarship</option>
+              </select>
+            </div>
+          </div>
+          <div class="compact-form-actions">
+            <button class="btn-primary" id="btnSaveStudent" style="width:auto;"><i class="fas fa-save"></i> Save Student</button>
+            <button class="btn-export" onclick="exportData('students')"><i class="fas fa-file-excel"></i> Export</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-box">
+        <h2><i class="fas fa-list"></i> Registered Students</h2>
+        <div class="table-controls">
+          <input type="text" id="studentSearch" placeholder="🔍 Search by ID, Name..." class="search-input" oninput="loadStudentsTable()">
+          <select id="studentFilterFaculty" class="filter-select" onchange="loadStudentsTable()">
+            <option value="">All Faculties</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Health Science">Health Science</option>
+            <option value="Business">Business</option>
+            <option value="Social Science">Social Science</option>
+          </select>
+          <button class="btn-secondary" onclick="clearStudentFilter()"><i class="fas fa-times"></i> Clear</button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>Name</th><th>Faculty</th>
+                <th>Shift</th><th>Status</th><th>Date</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="studentsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINANCE -->
+    <section class="page-section" id="finance" style="display:none;">
+      <div class="finance-summary">
+        <div class="finance-card required-card">
+          <i class="fas fa-file-invoice-dollar"></i>
+          <div><h3>Required</h3><h1 id="finRequired">$0</h1></div>
+        </div>
+        <div class="finance-card paid-card">
+          <i class="fas fa-check-circle"></i>
+          <div><h3>Paid</h3><h1 id="finPaid">$0</h1></div>
+        </div>
+        <div class="finance-card balance-card">
+          <i class="fas fa-exclamation-circle"></i>
+          <div><h3>Balance</h3><h1 id="finBalance">$0</h1></div>
+        </div>
+      </div>
+
+      <div class="section-box">
+        <h2><i class="fas fa-money-check-alt"></i> Payment Processing</h2>
+        <div class="form-grid">
+          <input type="text" id="finStudentId" placeholder="Student ID *">
+          <input type="text" id="finName" placeholder="Student Name" readonly>
+          <input type="text" id="finFaculty" placeholder="Faculty" readonly>
+          <select id="finSemester">
+            <option value="">Select Semester *</option>
+            <option>Semester 1</option>
+            <option>Semester 2</option>
+            <option>Semester 3</option>
+            <option>Semester 4</option>
+          </select>
+          <input type="number" id="finRequiredAmt" placeholder="Required Amount ($) *" min="0">
+          <input type="number" id="finPaidAmt" placeholder="Paid Amount ($) *" min="0">
+          <input type="date" id="finDate">
+        </div>
+        <div class="form-actions">
+          <button class="btn-secondary" id="btnSearchStudent"><i class="fas fa-search"></i> Search</button>
+          <button class="btn-primary" id="btnSavePayment" style="width:auto;"><i class="fas fa-save"></i> Save Payment</button>
+          <button class="btn-export" onclick="exportData('finance')"><i class="fas fa-file-excel"></i> Export</button>
+        </div>
+      </div>
+
+      <div class="section-box">
+        <h2><i class="fas fa-list"></i> Payment Records</h2>
+        <div class="table-controls">
+          <input type="text" id="financeSearch" placeholder="🔍 Search payments..." class="search-input" oninput="loadFinanceTable()">
+          <select id="financeFilterFaculty" class="filter-select" onchange="loadFinanceTable()">
+            <option value="">All Faculties</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Health Science">Health Science</option>
+            <option value="Business">Business</option>
+            <option value="Social Science">Social Science</option>
+          </select>
+          <button class="btn-secondary" onclick="clearFinanceFilter()"><i class="fas fa-times"></i> Clear</button>
+        </div>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>Name</th><th>Faculty</th><th>Semester</th>
+                <th>Required</th><th>Paid</th><th>Balance</th><th>Date</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="financeTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXAMINATION -->
+    <section class="page-section" id="examination" style="display:none;">
+      <div class="faculty-tabs">
+        <button class="tab-btn active" onclick="switchExamTab('cs', this)"><i class="fas fa-laptop-code"></i> Computer Science</button>
+        <button class="tab-btn" onclick="switchExamTab('health', this)"><i class="fas fa-heartbeat"></i> Health Science</button>
+        <button class="tab-btn" onclick="switchExamTab('business', this)"><i class="fas fa-briefcase"></i> Business</button>
+        <button class="tab-btn" onclick="switchExamTab('social', this)"><i class="fas fa-users"></i> Social Science</button>
+      </div>
+
+      <!-- CS Form -->
+      <div class="faculty-subform active" id="exam-cs">
+        <div class="section-box">
+          <h2><i class="fas fa-laptop-code"></i> Computer Science - Exam Entry</h2>
+          <div class="form-grid">
+            <input type="text" id="cs-id" placeholder="Student ID *">
+            <input type="text" id="cs-name" placeholder="Student Name" readonly>
+            <input type="text" id="cs-c1" placeholder="Course 1">
+            <input type="number" id="cs-m1" placeholder="Mark 1 (0-100)" min="0" max="100">
+            <input type="text" id="cs-c2" placeholder="Course 2">
+            <input type="number" id="cs-m2" placeholder="Mark 2 (0-100)" min="0" max="100">
+            <input type="text" id="cs-c3" placeholder="Course 3">
+            <input type="number" id="cs-m3" placeholder="Mark 3 (0-100)" min="0" max="100">
+          </div>
+          <div class="form-actions">
+            <button class="btn-secondary" onclick="searchExam('cs')"><i class="fas fa-search"></i> Search</button>
+            <button class="btn-primary" onclick="saveExam('cs')" style="width:auto;"><i class="fas fa-save"></i> Save Result</button>
+            <button class="btn-publish" onclick="publishResults('Computer Science')"><i class="fas fa-bullhorn"></i> Publish CS</button>
+            <button class="btn-export" onclick="exportData('exam_CS')"><i class="fas fa-file-excel"></i> Export CS</button>
+          </div>
+        </div>
+        <div class="section-box">
+          <h2><i class="fas fa-eye"></i> Preview Results (Courses & Marks)</h2>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>ID</th><th>Name</th><th>Course</th><th>Mark</th><th>GPA</th><th>Grade</th><th>Status</th><th>Date</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="cs-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Health Form -->
+      <div class="faculty-subform" id="exam-health">
+        <div class="section-box">
+          <h2><i class="fas fa-heartbeat"></i> Health Science - Exam Entry</h2>
+          <div class="form-grid">
+            <input type="text" id="health-id" placeholder="Student ID *">
+            <input type="text" id="health-name" placeholder="Student Name" readonly>
+            <input type="text" id="health-c1" placeholder="Course 1">
+            <input type="number" id="health-m1" placeholder="Mark 1 (0-100)" min="0" max="100">
+            <input type="text" id="health-c2" placeholder="Course 2">
+            <input type="number" id="health-m2" placeholder="Mark 2 (0-100)" min="0" max="100">
+            <input type="text" id="health-c3" placeholder="Course 3">
+            <input type="number" id="health-m3" placeholder="Mark 3 (0-100)" min="0" max="100">
+          </div>
+          <div class="form-actions">
+            <button class="btn-secondary" onclick="searchExam('health')"><i class="fas fa-search"></i> Search</button>
+            <button class="btn-primary" onclick="saveExam('health')" style="width:auto;"><i class="fas fa-save"></i> Save Result</button>
+            <button class="btn-publish" onclick="publishResults('Health Science')"><i class="fas fa-bullhorn"></i> Publish Health</button>
+            <button class="btn-export" onclick="exportData('exam_HEALTH')"><i class="fas fa-file-excel"></i> Export Health</button>
+          </div>
+        </div>
+        <div class="section-box">
+          <h2><i class="fas fa-eye"></i> Preview Results (Courses & Marks)</h2>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>ID</th><th>Name</th><th>Course</th><th>Mark</th><th>GPA</th><th>Grade</th><th>Status</th><th>Date</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="health-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Business Form -->
+      <div class="faculty-subform" id="exam-business">
+        <div class="section-box">
+          <h2><i class="fas fa-briefcase"></i> Business - Exam Entry</h2>
+          <div class="form-grid">
+            <input type="text" id="business-id" placeholder="Student ID *">
+            <input type="text" id="business-name" placeholder="Student Name" readonly>
+            <input type="text" id="business-c1" placeholder="Course 1">
+            <input type="number" id="business-m1" placeholder="Mark 1 (0-100)" min="0" max="100">
+            <input type="text" id="business-c2" placeholder="Course 2">
+            <input type="number" id="business-m2" placeholder="Mark 2 (0-100)" min="0" max="100">
+            <input type="text" id="business-c3" placeholder="Course 3">
+            <input type="number" id="business-m3" placeholder="Mark 3 (0-100)" min="0" max="100">
+          </div>
+          <div class="form-actions">
+            <button class="btn-secondary" onclick="searchExam('business')"><i class="fas fa-search"></i> Search</button>
+            <button class="btn-primary" onclick="saveExam('business')" style="width:auto;"><i class="fas fa-save"></i> Save Result</button>
+            <button class="btn-publish" onclick="publishResults('Business')"><i class="fas fa-bullhorn"></i> Publish Business</button>
+            <button class="btn-export" onclick="exportData('exam_BUSINESS')"><i class="fas fa-file-excel"></i> Export Business</button>
+          </div>
+        </div>
+        <div class="section-box">
+          <h2><i class="fas fa-eye"></i> Preview Results (Courses & Marks)</h2>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>ID</th><th>Name</th><th>Course</th><th>Mark</th><th>GPA</th><th>Grade</th><th>Status</th><th>Date</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="business-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Social Form -->
+      <div class="faculty-subform" id="exam-social">
+        <div class="section-box">
+          <h2><i class="fas fa-users"></i> Social Science - Exam Entry</h2>
+          <div class="form-grid">
+            <input type="text" id="social-id" placeholder="Student ID *">
+            <input type="text" id="social-name" placeholder="Student Name" readonly>
+            <input type="text" id="social-c1" placeholder="Course 1">
+            <input type="number" id="social-m1" placeholder="Mark 1 (0-100)" min="0" max="100">
+            <input type="text" id="social-c2" placeholder="Course 2">
+            <input type="number" id="social-m2" placeholder="Mark 2 (0-100)" min="0" max="100">
+            <input type="text" id="social-c3" placeholder="Course 3">
+            <input type="number" id="social-m3" placeholder="Mark 3 (0-100)" min="0" max="100">
+          </div>
+          <div class="form-actions">
+            <button class="btn-secondary" onclick="searchExam('social')"><i class="fas fa-search"></i> Search</button>
+            <button class="btn-primary" onclick="saveExam('social')" style="width:auto;"><i class="fas fa-save"></i> Save Result</button>
+            <button class="btn-publish" onclick="publishResults('Social Science')"><i class="fas fa-bullhorn"></i> Publish Social</button>
+            <button class="btn-export" onclick="exportData('exam_SOCIAL')"><i class="fas fa-file-excel"></i> Export Social</button>
+          </div>
+        </div>
+        <div class="section-box">
+          <h2><i class="fas fa-eye"></i> Preview Results (Courses & Marks)</h2>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>ID</th><th>Name</th><th>Course</th><th>Mark</th><th>GPA</th><th>Grade</th><th>Status</th><th>Date</th><th>Actions</th></tr>
+              </thead>
+              <tbody id="social-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PUBLISHED RESULTS -->
+    <section class="page-section" id="published" style="display:none;">
+      <div class="section-box">
+        <h2><i class="fas fa-check-circle"></i> Published Results by Faculty</h2>
+        <select id="publishedFacultyFilter" onchange="filterPublishedResults()" style="padding:12px; border-radius:10px; border:2px solid var(--border); margin-bottom:20px; width:300px;">
+          <option value="">-- Select Faculty --</option>
+          <option>Computer Science</option>
+          <option>Health Science</option>
+          <option>Business</option>
+          <option>Social Science</option>
+        </select>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr><th>ID</th><th>Name</th><th>GPA</th><th>Grade</th><th>Date</th></tr>
+            </thead>
+            <tbody id="publishedResultsBody">
+              <tr><td colspan="5" class="empty-state">Please select a faculty to view results.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- STUDENT PORTAL -->
+    <section class="page-section" id="portal" style="display:none;">
+      <div class="portal-new-container">
+        <div class="portal-hero">
+          <div class="portal-hero-bg"></div>
+          <div class="portal-hero-content">
+            <div class="portal-badge"><i class="fas fa-graduation-cap"></i></div>
+            <h1>Student Result Portal</h1>
+            <p>Access your academic records securely</p>
+            <div class="portal-stats">
+              <div class="portal-stat"><i class="fas fa-shield-alt"></i><span>Secure Access</span></div>
+              <div class="portal-stat"><i class="fas fa-clock"></i><span>24/7 Available</span></div>
+              <div class="portal-stat"><i class="fas fa-mobile-alt"></i><span>Mobile Friendly</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="portal-login-wrapper">
+          <div class="portal-login-card">
+            <div class="portal-login-header">
+              <i class="fas fa-user-graduate"></i>
+              <h2>Student Login</h2>
+              <p>Enter your credentials to view results</p>
+            </div>
+            <div class="portal-form-grid">
+              <input type="text" id="portalId" placeholder="Student ID">
+              <input type="password" id="portalPassword" placeholder="Password">
+              <select id="portalFaculty">
+                <option value="">Select Faculty</option>
+                <option>Computer Science</option>
+                <option>Health Science</option>
+                <option>Business</option>
+                <option>Social Science</option>
+              </select>
+            </div>
+            <button class="btn-primary portal-login-btn" id="portalLoginBtn">
+              <i class="fas fa-sign-in-alt"></i> Check Result
+            </button>
+          </div>
+          <div id="studentResultArea"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REPORTS -->
+    <section class="page-section" id="reports" style="display:none;">
+      <div class="section-box">
+        <h2><i class="fas fa-file-alt"></i> Generate Reports</h2>
+        <div class="form-grid">
+          <select id="reportType">
+            <option value="registration">Registration Report</option>
+            <option value="finance">Financial Report</option>
+            <option value="examination">Examination Report</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="generateReport()" style="width:auto;"><i class="fas fa-cogs"></i> Generate Report</button>
+        <div id="reportsOutput" style="margin-top:25px;"></div>
+      </div>
+    </section>
+
+    <!-- ARCHIVE -->
+    <section class="page-section" id="archive" style="display:none;">
+      <div class="section-box">
+        <h2><i class="fas fa-archive"></i> Create Archive Folder</h2>
+        <div class="form-grid">
+          <input type="text" id="archiveName" placeholder="Archive Name *" maxlength="50">
+          <select id="archiveYear">
+            <option value="">Select Year *</option>
+            <option>2024</option>
+            <option>2025</option>
+            <option>2026</option>
+            <option>2027</option>
+          </select>
+          <select id="archiveFaculty">
+            <option value="">Select Faculty *</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Health Science">Health Science</option>
+            <option value="Business">Business</option>
+            <option value="Social Science">Social Science</option>
+            <option value="All">All Faculties</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="createArchive()" style="width:auto;"><i class="fas fa-folder-plus"></i> Create Archive</button>
+      </div>
+      <div class="section-box">
+        <h2><i class="fas fa-folder-open"></i> Archive Folders (Click to Open)</h2>
+        <div class="archive-grid" id="archiveFolders"></div>
+      </div>
+    </section>
+
+    <!-- USERS -->
+    <section class="page-section" id="users" style="display:none;">
+      <div class="section-box">
+        <h2 id="userFormTitle"><i class="fas fa-user-plus"></i> Create System User</h2>
+        <div class="form-grid">
+          <input type="email" id="newEmail" placeholder="Email *">
+          <input type="text" id="newUsername" placeholder="Username *">
+          <input type="password" id="newPassword" placeholder="Password *">
+          <select id="newRole">
+            <option value="registration">Registration Office</option>
+            <option value="finance">Finance Office</option>
+            <option value="examination">Examination Office</option>
+          </select>
+        </div>
+        <div class="permissions-grid">
+          <label class="permission-checkbox"><input type="checkbox" id="perm-dashboard" checked disabled><span>Dashboard</span></label>
+          <label class="permission-checkbox"><input type="checkbox" id="perm-registration"><span>Registration</span></label>
+          <label class="permission-checkbox"><input type="checkbox" id="perm-examination"><span>Examination</span></label>
+          <label class="permission-checkbox"><input type="checkbox" id="perm-published"><span>Published Results</span></label>
+          <label class="permission-checkbox"><input type="checkbox" id="perm-finance"><span>Finance</span></label>
+          <label class="permission-checkbox"><input type="checkbox" id="perm-portal"><span>Student Portal</span></label>
+          <label class="permission-checkbox"><input type="checkbox" id="perm-reports"><span>Reports</span></label>
+          <label class="permission-checkbox"><input type="checkbox" id="perm-archive"><span>Archive</span></label>
+        </div>
+        <div class="form-actions">
+          <button class="btn-primary" id="btnCreateUser" style="width:auto;"><i class="fas fa-user-plus"></i> Create User</button>
+          <button class="btn-secondary" id="btnUpdateUser" style="display:none;"><i class="fas fa-save"></i> Update User</button>
+          <button class="btn-secondary" onclick="clearUserForm()"><i class="fas fa-times"></i> Clear</button>
+        </div>
+      </div>
+      <div class="section-box">
+        <h2><i class="fas fa-users"></i> System Users</h2>
+        <div class="table-container">
+          <table>
+            <thead><tr><th>Username</th><th>Email</th><th>Role</th><th>Permissions</th><th>Actions</th></tr></thead>
+            <tbody id="usersTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="page-section" id="settings" style="display:none;">
+      <div class="settings-hero">
+        <i class="fas fa-cogs"></i>
+        <h2>System Settings</h2>
+        <p>Configure your system preferences</p>
+      </div>
+      <div class="settings-grid">
+        <div class="setting-item">
+          <div class="setting-info">
+            <h3><i class="fas fa-moon"></i> Dark Mode</h3>
+            <p>Switch between light and dark theme</p>
+          </div>
+          <label class="switch"><input type="checkbox" id="themeToggle" onchange="toggleTheme()"><span class="slider"></span></label>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h3><i class="fas fa-bell"></i> Notifications</h3>
+            <p>Enable system alerts and toasts</p>
+          </div>
+          <label class="switch"><input type="checkbox" id="notifToggle" checked><span class="slider"></span></label>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h3><i class="fas fa-download"></i> Backup Data</h3>
+            <p>Download all system data as JSON</p>
+          </div>
+          <button class="btn-export" onclick="exportData('all')"><i class="fas fa-download"></i> Download Backup</button>
+        </div>
+        <div class="setting-item">
+          <div class="setting-info">
+            <h3><i class="fas fa-upload"></i> Restore Data</h3>
+            <p>Restore system from backup file</p>
+          </div>
+          <label class="btn-secondary" style="cursor:pointer;">
+            <i class="fas fa-upload"></i> Choose File
+            <input type="file" id="restoreFile" accept=".json" style="display:none;" onchange="restoreData(event)">
+          </label>
+        </div>
+        <div class="setting-item danger-zone">
+          <div class="setting-info">
+            <h3><i class="fas fa-trash-alt"></i> Clear All Data</h3>
+            <p>Reset system to default (cannot be undone)</p>
+          </div>
+          <button class="btn-danger" onclick="clearAllData()"><i class="fas fa-trash"></i> Clear Data</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="page-section" id="about" style="display:none;">
+      <div class="about-hero">
+        <i class="fas fa-graduation-cap"></i>
+        <h1>Prime College ERP</h1>
+        <p>Professional Education Management System</p>
+      </div>
+      <div class="about-grid">
+        <div class="about-card">
+          <div class="about-card-icon"><i class="fas fa-info-circle"></i></div>
+          <h3>System Information</h3>
+          <div class="about-info-list">
+            <div class="info-row"><span>Version</span><strong>6.0 Online</strong></div>
+            <div class="info-row"><span>Release Year</span><strong>2026</strong></div>
+            <div class="info-row"><span>Security</span><strong>Firebase Authentication</strong></div>
+            <div class="info-row"><span>Storage</span><strong>Firebase Firestore</strong></div>
+            <div class="info-row"><span>Developer</span><strong>Prime Tech Team</strong></div>
+          </div>
+        </div>
+        <div class="about-card">
+          <div class="about-card-icon"><i class="fas fa-star"></i></div>
+          <h3>Key Features</h3>
+          <ul class="feature-list">
+            <li><i class="fas fa-check-circle"></i> Cloud-Based System</li>
+            <li><i class="fas fa-check-circle"></i> Real-Time Sync</li>
+            <li><i class="fas fa-check-circle"></i> Multi-Device Access</li>
+            <li><i class="fas fa-check-circle"></i> Secure Authentication</li>
+            <li><i class="fas fa-check-circle"></i> Auto Backup</li>
+            <li><i class="fas fa-check-circle"></i> Excel Export</li>
+          </ul>
+        </div>
+        <div class="about-card">
+          <div class="about-card-icon"><i class="fas fa-heart"></i></div>
+          <h3>Contact & Support</h3>
+          <div class="about-info-list">
+            <div class="info-row"><span><i class="fas fa-envelope"></i> Email</span><strong>info@primecollege.so</strong></div>
+            <div class="info-row"><span><i class="fas fa-phone"></i> Phone</span><strong>+252 61 XXX XXXX</strong></div>
+            <div class="info-row"><span><i class="fas fa-map-marker-alt"></i> Location</span><strong>Mogadishu, Somalia</strong></div>
+            <div class="info-row"><span><i class="fas fa-globe"></i> Website</span><strong>www.primecollege.so</strong></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- GLOBAL SEARCH MODAL -->
+<div class="modal" id="searchModal">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('searchModal')">&times;</button>
+    <h2><i class="fas fa-search"></i> Global Search</h2>
+    <input type="text" id="globalSearchInput" placeholder="Search students, payments, results..." oninput="performGlobalSearch()">
+    <div id="globalSearchResults"></div>
+  </div>
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
