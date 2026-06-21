@@ -1,4 +1,21 @@
-/* ========================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+// Your Firebase config (replace with your actual config)
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY_HERE",
+  authDomain: "prime-college-erp.firebaseapp.com",
+  projectId: "prime-college-erp",
+  storageBucket: "prime-college-erp.appspot.com",
+  messagingSenderId: "608090500576",
+  appId: "1:608090500576:web:536c03a82161ab480ecf85"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);/* ========================================
 PRIME COLLEGE ERP - COMPLETE SYSTEM
 ======================================== */
 
