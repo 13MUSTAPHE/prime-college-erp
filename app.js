@@ -1,3 +1,9 @@
+const auth = window.firebaseAuth || null;
+const db = window.firebaseDb || null;
+
+// Kadibna code-kii hore...
+let students = JSON.parse(localStorage.getItem("students")) || [];
+let payments = JSON.parse(localStorage.getItem("payments")) || [];
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
