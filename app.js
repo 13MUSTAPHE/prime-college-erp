@@ -25,7 +25,7 @@ PRIME COLLEGE ERP - COMPLETE SYSTEM
 ======================================== */
 
 // ✅ KU DAR TAN BILOWGA:
-const auth = window.firebaseAuth;
+
 const db = window.firebaseDb;
 
 // Hadda variables-kii hore
